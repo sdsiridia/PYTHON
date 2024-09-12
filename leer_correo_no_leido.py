@@ -32,6 +32,8 @@ for i, mail_id in enumerate(mail_ids):
                         print('\n=================\nMultipart\n=================\n')
                         print(f'Body: {body}\n')
                         print('\n=================\nMultipart\n=================\n')
+                        if 'personas' in body:
+                            print(' palabra encontrada')
             else:
                 body = msg.get_payload(decode=True).decode()
                 print('\n=================\nnormal\n=================\n')

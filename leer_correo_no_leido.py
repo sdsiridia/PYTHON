@@ -33,12 +33,16 @@ for i, mail_id in enumerate(mail_ids):
                         print(f'Body: {body}\n')
                         print('\n=================\nMultipart\n=================\n')
                         # voy a intentar encontrar las palabras para podeer filtrar
-                        if 'prueba' in body:
-                            print(' palabra encontrada')
+                        if 'Número de errores:' in body:
+                            indice = body.find("Número de errores:")
+                            sub_body = body[indice+19:indice + 50]
+                            errores = int(sub_body.split(".")[0])
+
+                            print(f"La cantidad de errores es: {errores}")
             else:
                 body = msg.get_payload(decode=True).decode()
                 print('\n=================\nnormal\n=================\n')
                 print(f'Body: {body}\n')
                 print('\n=================\nnormal\n=================\n')
-    if i > 3:
+    if i > 1:
         break

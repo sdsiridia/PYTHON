@@ -5,12 +5,13 @@ import email
 from email.header import decode_header  # metodo para leer el encabezado
 import webbrowser
 import os
+import getpass
 # import getpass -> PARA USAR CUANDO QUEREMOS ESCRIBIR LA CONTRASEÑA
 # Y NO PASARLA COMO PARAMETRO Y QUE SE ESCONDA LINEA 13
 
 # Datos del usuario PODEMOS PEDIRLOS COMO MUESTRA
-USERNAME = 'sdsiridia@gmail.com'  # input("Correo: ")
-PASSWORD = 'ljtckojprksyeiyz'  # getpass("PASSWORD: ")
+USERNAME = input("Correo: ")
+PASSWORD = getpass.getpass("Contraseña: ")
 
 # Crear conexión
 imap = imaplib.IMAP4_SSL("imap.gmail.com")
@@ -71,7 +72,7 @@ for i in range(can_mensajes, can_mensajes - N, -1):
                         # igual mas abajo lo decodifico con el mismo metodo pero sobre
                         # la variable body revisar si es asi
                         #  lo he quitado por que da error
-                        # .decode('utf-8') lo he colocado en la linea 77
+                        # .decode('utf-8') lo he colocado en la linea 82
                         body = part.get_payload(
                             decode=True)
 

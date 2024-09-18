@@ -1,11 +1,12 @@
-'''Leer correos no leidos y sacar su asunto, orign y cuerpo'''
+'''
+Leer correos no leidos y sacar su asunto, origen y cuerpo
+'''
 import imaplib
 import email
 import time
 import getpass
 from rich.live import Live
 from rich.table import Table
-from rich import print
 
 # diccionario para guardar asuntos y cantidad de errores
 dic_errores = {}
@@ -32,16 +33,18 @@ for i, mail_id in enumerate(mail_ids):
             msg = email.message_from_bytes(response_part[1])
             subject = msg['subject']
             from_ = msg['from']
-            # print de control
+            # ============print de control============
             # print(f'From: {from_}\nSubject: {subject}\n')
-
+            # revisar 0000000000000000000000000000000000000000000000000000000
+            # from_ = from_.split(',')
+            # print(type(from_))
             # Obtener el cuerpo del mensaje
             if msg.is_multipart():
                 for part in msg.walk():
                     if part.get_content_type() == 'text/plain':
                         # he quitado el .decode()
                         body = part.get_payload(decode=True).decode('latin-1')
-                        # print de control
+                        # ============print de control============
                         # print('\n=================\nMultipart\n=================\n')
                         # print(f'Body: {body}\n')
                         # print('\n=================\nMultipart\n=================\n')
@@ -51,9 +54,6 @@ for i, mail_id in enumerate(mail_ids):
                             sub_body = body[indice+19:indice + 50]
                             errores = int(sub_body.split(".")[0])
                             # print(f"La cantidad de errores es: {errores}")
-
-                            # subject = subject[5:]
-                            # dic_errores[subject] = errores
                             dic_errores[from_] = errores
                         else:
                             mail.store(mail_id, '-FLAGS', '\\Seen')
@@ -61,6 +61,7 @@ for i, mail_id in enumerate(mail_ids):
             else:
                 body = msg.get_payload(decode=True).decode()
                 if 'Número de errores:' in body:
+
                     indice = body.find("Número de errores:")
                     sub_body = body[indice+19:indice + 50]
                     errores = int(sub_body.split(".")[0])
@@ -68,15 +69,17 @@ for i, mail_id in enumerate(mail_ids):
                     # subject = subject[5:]
                     # dic_errores[subject] = errores
                     dic_errores[from_] = errores
+                    if 'Número de errores: 0' not in body:
+                        mail.store(mail_id, '-FLAGS', '\\Seen')
                 else:
                     mail.store(mail_id, '-FLAGS', '\\Seen')
-                # print de control
+                # ============print de control============
                 # print('\n=================\nnormal\n=================\n')
                 # print(f'Body: {body}\n')
                 # print('\n=================\nnormal\n=================\n')
-# porsi quiero parar en una cantidad de mensajes especifico
-# if i > 1:
-#     break
+# por si quiero parar en una cantidad de mensajes especifico
+    # if i > 1:
+    #     break
 mail.close()
 mail.logout()
 # armamos la tabla para presentar los datos

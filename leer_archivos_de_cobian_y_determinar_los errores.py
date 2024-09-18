@@ -1,6 +1,4 @@
-'''
-Leer correos no leidos y sacar su asunto, origen y cuerpo
-'''
+'''Leer correos no leidos y sacar su asunto, origen y cuerpo'''
 import imaplib
 import email
 import time
@@ -33,6 +31,7 @@ for i, mail_id in enumerate(mail_ids):
             msg = email.message_from_bytes(response_part[1])
             subject = msg['subject']
             from_ = msg['from']
+            # print(msg['from'])
             # ============print de control============
             # print(f'From: {from_}\nSubject: {subject}\n')
             # revisar 0000000000000000000000000000000000000000000000000000000
@@ -54,6 +53,8 @@ for i, mail_id in enumerate(mail_ids):
                             sub_body = body[indice+19:indice + 50]
                             errores = int(sub_body.split(".")[0])
                             # print(f"La cantidad de errores es: {errores}")
+                            indice_2 = from_.find('<')
+                            from_ = from_[:indice_2]
                             dic_errores[from_] = errores
                         else:
                             mail.store(mail_id, '-FLAGS', '\\Seen')
@@ -68,6 +69,8 @@ for i, mail_id in enumerate(mail_ids):
                     # print(f"La cantidad de errores es: {errores}")
                     # subject = subject[5:]
                     # dic_errores[subject] = errores
+                    indice_2 = from_.find('<')
+                    from_ = from_[:indice_2]
                     dic_errores[from_] = errores
                     if 'Número de errores: 0' not in body:
                         mail.store(mail_id, '-FLAGS', '\\Seen')

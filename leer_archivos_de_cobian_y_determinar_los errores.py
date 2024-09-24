@@ -34,9 +34,6 @@ for i, mail_id in enumerate(mail_ids):
             # print(msg['from'])
             # ============print de control============
             # print(f'From: {from_}\nSubject: {subject}\n')
-            # revisar 0000000000000000000000000000000000000000000000000000000
-            # from_ = from_.split(',')
-            # print(type(from_))
             # Obtener el cuerpo del mensaje
             if msg.is_multipart():
                 for part in msg.walk():
@@ -62,7 +59,6 @@ for i, mail_id in enumerate(mail_ids):
             else:
                 body = msg.get_payload(decode=True).decode()
                 if 'Número de errores:' in body:
-
                     indice = body.find("Número de errores:")
                     sub_body = body[indice+19:indice + 50]
                     errores = int(sub_body.split(".")[0])
@@ -73,6 +69,18 @@ for i, mail_id in enumerate(mail_ids):
                     from_ = from_[:indice_2]
                     dic_errores[from_] = errores
                     if 'Número de errores: 0' not in body:
+                        mail.store(mail_id, '-FLAGS', '\\Seen')
+                elif 'Errores:' in body:
+                    indice = body.find("Errores:")
+                    sub_body = body[indice+9:indice + 50]
+                    errores = int(sub_body.split(".")[0])
+                    # print(f"La cantidad de errores es: {errores}")
+                    # subject = subject[5:]
+                    # dic_errores[subject] = errores
+                    indice_2 = from_.find('<')
+                    from_ = from_[:indice_2]
+                    dic_errores[from_] = errores
+                    if 'Errores: 0' not in body:
                         mail.store(mail_id, '-FLAGS', '\\Seen')
                 else:
                     mail.store(mail_id, '-FLAGS', '\\Seen')

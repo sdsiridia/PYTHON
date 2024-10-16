@@ -95,16 +95,22 @@ mail.close()
 mail.logout()
 # armamos la tabla para presentar los datos
 # print(dic_errores)
-table = Table()
-table.add_column("Origen")
-table.add_column("ERRORES")
+if len(dic_errores) > 0:
+    table = Table()
+    table.add_column("Origen")
+    table.add_column("ERRORES")
 
-with Live(table, refresh_per_second=4):
-    for clave, valor in dic_errores.items():
-        time.sleep(0.4)
-        if valor == 0:
-            table.add_row(f"[bold green]{clave}[/bold green]", f"[bold green] {
-                          valor}[bold green] :smiley:")
-        else:
-            table.add_row(f"[bold red]{clave}[/bold red]", f"[bold red] {
-                          valor}[/bold red] :pile_of_poo:")
+    with Live(table, refresh_per_second=4):
+        for clave, valor in dic_errores.items():
+            time.sleep(0.4)
+            if valor == 0:
+                table.add_row(f"[bold green]{clave}[/bold green]", f"[bold green] {
+                    valor}[/bold green] :smiley:")
+            else:
+                table.add_row(f"[bold red]{clave}[/bold red]", f"[bold red] {
+                    valor}[/bold red] :pile_of_poo:")
+else:
+    table1 = Table()
+    table1.add_column("[bold green]MENSAJES[/bold green]", justify="center")
+    with Live(table1, refresh_per_second=4):
+        table1.add_row("[bold green]No hay MENSAJES[/bold green]:smiley:")

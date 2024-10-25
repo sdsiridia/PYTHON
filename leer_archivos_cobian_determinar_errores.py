@@ -97,8 +97,8 @@ mail.logout()
 # print(dic_errores)
 if len(dic_errores) > 0:
     table = Table()
-    table.add_column("Origen")
-    table.add_column("ERRORES")
+    table.add_column("Origen", justify="center")
+    table.add_column("ERRORES", justify="center")
 
     with Live(table, refresh_per_second=4):
         for clave, valor in dic_errores.items():

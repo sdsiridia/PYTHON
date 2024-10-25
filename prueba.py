@@ -1,6 +1,10 @@
-from rich.live import Live
-from rich.table import Table
-table1 = Table()
-table1.add_column("Origen")
-with Live(table1, refresh_per_second=4):
-    table1.add_row("[bold green]No hay MENSAJES[/bold green]:smiley:")
+# pedir al usuario que indrodusca el nombre
+nombre = input("introduce tu nombre: ")
+# comprobar si ese nombre es del administrador
+administrador = "camilo"
+# si es igual es bienvenida personalizada
+if nombre.lower == administrador:
+    print("bienvenido, ", nombre, " !")
+# si no, bienvenida general
+else:
+    print("bienvenido invitado")

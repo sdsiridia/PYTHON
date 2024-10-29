@@ -11,6 +11,8 @@ dic_errores = {}
 
 # Conectar a la cuenta de Gmail
 mail = imaplib.IMAP4_SSL('imap.gmail.com')
+
+# Pedir el usuario y la contraseña
 USERNAME = input("Correo: ")
 PASSWORD = getpass.getpass("Contraseña: ")
 mail.login(USERNAME, PASSWORD)

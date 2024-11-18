@@ -101,15 +101,16 @@ if len(dic_errores) > 0:
     table = Table()
     table.add_column("Origen", justify="center")
     table.add_column("ERRORES", justify="center")
-
+    i = 0
     with Live(table, refresh_per_second=4):
         for clave, valor in dic_errores.items():
+            i = i+1
             time.sleep(0.4)
             if valor == 0:
-                table.add_row(f"[bold green]{clave}[/bold green]", f"[bold green] {
+                table.add_row(f"[bold green]{i}.- {clave}[/bold green]", f"[bold green] {
                     valor}[/bold green] :smiley:")
             else:
-                table.add_row(f"[bold red]{clave}[/bold red]", f"[bold red] {
+                table.add_row(f"[bold red]{i}.- {clave}[/bold red]", f"[bold red] {
                     valor}[/bold red] :pile_of_poo:")
 else:
     table1 = Table()

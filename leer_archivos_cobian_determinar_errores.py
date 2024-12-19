@@ -53,7 +53,7 @@ for i, mail_id in enumerate(mail_ids):
                             errores = int(sub_body.split(".")[0])
                             # print(f"La cantidad de errores es: {errores}")
                             indice_2 = from_.find('<')
-                            from_ = from_[:indice_2]
+                            from_ = from_[:indice_2] + msg['Date']
                             dic_errores[from_] = errores
                         else:
                             mail.store(mail_id, '-FLAGS', '\\Seen')
@@ -68,7 +68,7 @@ for i, mail_id in enumerate(mail_ids):
                     # subject = subject[5:]
                     # dic_errores[subject] = errores
                     indice_2 = from_.find('<')
-                    from_ = from_[:indice_2]
+                    from_ = from_[:indice_2] + msg['Date']
                     dic_errores[from_] = errores
                     if 'Número de errores: 0' not in body:
                         mail.store(mail_id, '-FLAGS', '\\Seen')
@@ -80,7 +80,7 @@ for i, mail_id in enumerate(mail_ids):
                     # subject = subject[5:]
                     # dic_errores[subject] = errores
                     indice_2 = from_.find('<')
-                    from_ = from_[:indice_2]
+                    from_ = from_[:indice_2] + msg['Date']
                     dic_errores[from_] = errores
                     if 'Errores: 0' not in body:
                         mail.store(mail_id, '-FLAGS', '\\Seen')

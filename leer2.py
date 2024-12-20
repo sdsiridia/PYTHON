@@ -1,7 +1,7 @@
 '''saber la hora de recepcion de un email'''
 import imaplib
 import email
-from email.header import decode_header
+# from email.header import decode_header
 import datetime
 import getpass
 

@@ -31,7 +31,8 @@ for i in range(can_mensajes, can_mensajes - N, -1):
     #    print(f"vamos por el mensaje: {i}")
     #     # Obtener el mensaje
     try:  # -> por si la cantidad de mensajes que quiero leer es superior a la que existen
-        # fetch -> obtener el mensaje i RFC822 -> es un standar dice que voy as pedir todas las partes del mensaje
+        # fetch -> obtener el mensaje i RFC822 -> es un standar dice que voy as pedir
+        # todas las partes del mensaje
         # las variables res y mensaje es por que 'imap.fetch(str(i), "(RFC822)")'
         # nos devuelve la respuesta de la solicitud y el mensaje
         # srt(i) -> i es el numero de mensaje | metodo fetch pide un string

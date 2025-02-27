@@ -1,4 +1,5 @@
 '''Leer correos no leidos y sacar su asunto, origen y cuerpo'''
+from colorama import Fore, Style, init, Back
 import imaplib
 import email
 import time
@@ -118,11 +119,13 @@ mail.logout()
 
 
 TEXTO = pyfiglet.figlet_format("Backup", font="slant")
-print(TEXTO)
+
 
 # armamos la tabla para presentar los datos
 # print(dic_errores)
 if len(dic_errores) > 0:
+    init()
+    print(Fore.RED + TEXTO)
     table = Table()
     table.add_column("Origen", justify="center")
     table.add_column("ERRORES", justify="center")
@@ -142,6 +145,8 @@ if len(dic_errores) > 0:
                     f"[bold red]{valor}[/bold red] :pile_of_poo:"
                 )
 else:
+    init()
+    print(Fore.GREEN + TEXTO)
     table1 = Table()
     table1.add_column("[bold green]MENSAJES[/bold green]", justify="center")
     with Live(table1, refresh_per_second=4):

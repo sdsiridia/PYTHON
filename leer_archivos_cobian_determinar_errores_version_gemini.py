@@ -3,10 +3,9 @@ import imaplib
 import email
 import time
 import getpass
-import pyfiglet
 from rich.live import Live
 from rich.table import Table
-# import pyfiglet
+import pyfiglet  
 
 # diccionario para guardar asuntos y cantidad de errores
 dic_errores = {}
@@ -61,7 +60,7 @@ for i, mail_id in enumerate(mail_ids):
                             mail.store(mail_id, '-FLAGS', '\\Seen')
 
             else:
-                body = msg.get_payload(decode=True).decode()
+                body = msg.get_payload(decode=True).decode('latin-1') # se agrega latin-1
                 if 'Número de errores:' in body:
                     indice = body.find("Número de errores:")
                     sub_body = body[indice+19:indice + 50]
@@ -99,7 +98,7 @@ mail.close()
 mail.logout()
 # creacion del titulo
 TEXTO = pyfiglet.figlet_format("Errores")
-print(TEXTO)
+print(TEXTO) # se cambia la variable
 # armamos la tabla para presentar los datos
 # print(dic_errores)
 if len(dic_errores) > 0:
@@ -112,11 +111,9 @@ if len(dic_errores) > 0:
             i = i+1
             time.sleep(0.4)
             if valor == 0:
-                table.add_row(f"[bold green]{i}.- {clave}[/bold green]", f"[bold green] {
-                    valor}[/bold green] :smiley:")
+                table.add_row(f"[bold green]{i}.- {clave}[/bold green]", f"[bold green]{valor}[/bold green] :smiley:")
             else:
-                table.add_row(f"[bold red]{i}.- {clave}[/bold red]", f"[bold red] {
-                    valor}[/bold red] :pile_of_poo:")
+                table.add_row(f"[bold red]{i}.- {clave}[/bold red]", f"[bold red]{valor}[/bold red] :pile_of_poo:")
 else:
     table1 = Table()
     table1.add_column("[bold green]MENSAJES[/bold green]", justify="center")

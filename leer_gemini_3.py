@@ -84,7 +84,7 @@ for mail_index, mail_id in enumerate(mail_ids):
                         from_con_fecha = from_original[:indice_2] + msg['Date']
                         dic_errores[from_con_fecha] = errores
                         if PALABRA_NUMERO_ERRORES_CERO not in body:
-                            mail.store(mail_id, '-FLAGS', 'Seen')
+                            mail.store(mail_id, '-FLAGS', '\\Seen')
                         return True
                     elif PALABRA_ERRORES in body:
                         indice = body.find(PALABRA_ERRORES)
@@ -100,10 +100,10 @@ for mail_index, mail_id in enumerate(mail_ids):
                         from_con_fecha = from_original[:indice_2] + msg['Date']
                         dic_errores[from_con_fecha] = errores
                         if PALABRA_ERRORES_CERO not in body:
-                            mail.store(mail_id, '-FLAGS', 'Seen')
+                            mail.store(mail_id, '-FLAGS', '\\Seen')
                         return True
                     else:
-                        mail.store(mail_id, '-FLAGS', 'Seen')
+                        mail.store(mail_id, '-FLAGS', '\\Seen')
                         return False
 
                 tiene_errores(body, mail_id)

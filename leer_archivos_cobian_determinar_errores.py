@@ -108,8 +108,8 @@ gradient_colors = [
 # Generar texto con pyfiglet
 ascii_text = pyfiglet.figlet_format("Backup", font="slant")
 
-# Aplicar el degradado
 TEXTO = gradient_text(ascii_text, gradient_colors)
+# Aplicar el degradado
 
 
 # print(TEXTO)

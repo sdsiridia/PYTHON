@@ -1,9 +1,9 @@
 ''' Listado de funciones'''
 import imaplib
-import email
-from colorama import Fore, Style, init, Back
-import time
-import getpass
+# import email
+from colorama import Style  # Fore, init, Back
+# import time
+# import getpass
 
 
 def gradient_text(text, colors):

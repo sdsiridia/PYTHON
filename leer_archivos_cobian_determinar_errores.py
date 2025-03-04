@@ -98,14 +98,36 @@ for i, mail_id in enumerate(mail_ids):
     #     break
 mail.close()
 mail.logout()
-# creacion del titulo
-TEXTO = pyfiglet.figlet_format("Backup", font="slant")
+
+
+def gradient_text(text, colors):
+    '''pintar de un color cada parte del texto'''
+    colored_text = ""
+    for i, char in enumerate(text):
+        # Repetir colores en caso de que el texto sea más largo
+        color = colors[i % len(colors)]
+        colored_text += color + char
+    return colored_text + Style.RESET_ALL
+
+
+# Definir colores ANSI para el degradado
+gradient_colors = [
+    Fore.RED, Fore.YELLOW, Fore.GREEN, Fore.CYAN, Fore.BLUE, Fore.MAGENTA
+]
+
+# Generar texto con pyfiglet
+ascii_text = pyfiglet.figlet_format("Backup", font="univers")
+
+# Aplicar el degradado
+TEXTO = gradient_text(ascii_text, gradient_colors)
+
+
 # print(TEXTO)
 # armamos la tabla para presentar los datos
 # print(dic_errores)
 if len(dic_errores) > 0:
     init()
-    print(Fore.RED + TEXTO)
+    print(TEXTO)
     table = Table()
     table.add_column("Origen", justify="center")
     table.add_column("ERRORES", justify="center")
@@ -122,7 +144,7 @@ if len(dic_errores) > 0:
                     valor}[/bold red] :pile_of_poo:")
 else:
     init()
-    print(Fore.GREEN + TEXTO)
+    print(TEXTO)
     table1 = Table()
     table1.add_column("[bold green]MENSAJES[/bold green]", justify="center")
     with Live(table1, refresh_per_second=4):

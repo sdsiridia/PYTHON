@@ -7,7 +7,7 @@ import getpass
 import pyfiglet
 from rich.live import Live
 from rich.table import Table
-# import pyfiglet
+from funciones import gradient_text
 
 # diccionario para guardar asuntos y cantidad de errores
 dic_errores = {}
@@ -98,16 +98,6 @@ for i, mail_id in enumerate(mail_ids):
     #     break
 mail.close()
 mail.logout()
-
-
-def gradient_text(text, colors):
-    '''pintar de un color cada parte del texto'''
-    colored_text = ""
-    for i, char in enumerate(text):
-        # Repetir colores en caso de que el texto sea más largo
-        color = colors[i % len(colors)]
-        colored_text += color + char
-    return colored_text + Style.RESET_ALL
 
 
 # Definir colores ANSI para el degradado

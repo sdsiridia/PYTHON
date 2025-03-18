@@ -27,3 +27,8 @@ def seleccionar_bandeja(mail):
     '''seleccionar la bandeja'''
     mail.select('inbox')
     return mail
+
+
+def marcar_no_leido(mail, email_id):
+    """Marcar un correo como no leído."""
+    mail.store(email_id, "-FLAGS", "\\Seen")

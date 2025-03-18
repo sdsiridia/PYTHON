@@ -1,13 +1,14 @@
 '''Leer correos no leidos y sacar su asunto, origen y cuerpo'''
-from colorama import Fore, Style, init, Back
 import imaplib
 import email
 import time
 import getpass
+from colorama import Fore, Style, init, Back
 import pyfiglet
 from rich.live import Live
 from rich.table import Table
-from funciones import gradient_text
+from funciones import gradient_text, marcar_no_leido
+
 
 # diccionario para guardar asuntos y cantidad de errores
 dic_errores = {}
@@ -58,8 +59,23 @@ for i, mail_id in enumerate(mail_ids):
                             indice_2 = from_.find('<')
                             from_ = from_[:indice_2] + msg['Date']
                             dic_errores[from_] = errores
+                            if 'Número de errores: 0' not in body:
+                                marcar_no_leido(mail, mail_id)
+                        elif 'Errores:' in body:
+                            indice = body.find("Errores:")
+                            sub_body = body[indice+9:indice + 50]
+                            errores = int(sub_body.split(".")[0])
+                            # print(f"La cantidad de errores es: {errores}")
+                            # subject = subject[5:]
+                            # dic_errores[subject] = errores
+                            indice_2 = from_.find('<')
+                            from_ = from_[:indice_2] + msg['Date']
+                            dic_errores[from_] = errores
+                            if 'Errores: 0' not in body:
+                                marcar_no_leido(mail, mail_id)
                         else:
-                            mail.store(mail_id, '-FLAGS', '\\Seen')
+                            marcar_no_leido(mail, mail_id)
+                            # mail.store(mail_id, '-FLAGS', '\\Seen')
 
             else:
                 body = msg.get_payload(decode=True).decode()
@@ -74,7 +90,8 @@ for i, mail_id in enumerate(mail_ids):
                     from_ = from_[:indice_2] + msg['Date']
                     dic_errores[from_] = errores
                     if 'Número de errores: 0' not in body:
-                        mail.store(mail_id, '-FLAGS', '\\Seen')
+                        marcar_no_leido(mail, mail_id)
+                        # mail.store(mail_id, '-FLAGS', '\\SEEN')
                 elif 'Errores:' in body:
                     indice = body.find("Errores:")
                     sub_body = body[indice+9:indice + 50]
@@ -86,9 +103,11 @@ for i, mail_id in enumerate(mail_ids):
                     from_ = from_[:indice_2] + msg['Date']
                     dic_errores[from_] = errores
                     if 'Errores: 0' not in body:
-                        mail.store(mail_id, '-FLAGS', '\\Seen')
+                        marcar_no_leido(mail, mail_id)
+                        # mail.store(mail_id, '-FLAGS', '\\Seen')
                 else:
-                    mail.store(mail_id, '-FLAGS', '\\Seen')
+                    marcar_no_leido(mail, mail_id)
+                    # mail.store(mail_id, '-FLAGS', '\\Seen')
                 # ============print de control============
                 # print('\n=================\nnormal\n=================\n')
                 # print(f'Body: {body}\n')

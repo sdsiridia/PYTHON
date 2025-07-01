@@ -3,8 +3,11 @@ import imaplib
 import email
 import time
 import getpass
-from colorama import Fore, Style, init, Back
+from tqdm import tqdm
+
+from colorama import Fore, init  # , Style, Back
 import pyfiglet
+from rich.console import Console
 from rich.live import Live
 from rich.table import Table
 from funciones import gradient_text, marcar_no_leido
@@ -29,8 +32,10 @@ status, messages = mail.search(None, 'UNSEEN')
 
 # Obtener la lista de IDs de correos no leídos
 mail_ids = messages[0].split()
-# print(mail_ids)
-for i, mail_id in enumerate(mail_ids):
+mail_num = len(mail_ids)
+# print(f "Se encontraron {mail_num} correos no leídos")
+# for i, mail_id in enumerate(mail_ids):
+for i, mail_id in enumerate(tqdm(mail_ids, desc="Leyendo correos")):
     status, msg_data = mail.fetch(mail_id, '(RFC822)')
     for response_part in msg_data:
         if isinstance(response_part, tuple):
@@ -133,8 +138,9 @@ TEXTO = gradient_text(ascii_text, gradient_colors)
 
 # print(TEXTO)
 # armamos la tabla para presentar los datos
-# print(dic_errores)
+print(dic_errores)
 if len(dic_errores) > 0:
+    dic_errores_num = len(dic_errores)  # para contar la cantidad de errores
     init()
     print(TEXTO)
     table = Table()
@@ -143,6 +149,7 @@ if len(dic_errores) > 0:
     i = 0
     with Live(table, refresh_per_second=4):
         for clave, valor in dic_errores.items():
+
             i = i+1
             time.sleep(0.4)
             if valor == 0:

@@ -1,18 +1,102 @@
 '''Leer correos no leidos y sacar su asunto, origen y cuerpo'''
-from colorama import Fore, Style, init, Back
+import os
+import csv
+import re
+from email.header import decode_header
+import ssl
 import imaplib
 import email
 import time
-import getpass
-import pyfiglet
 import tkinter as tk
 from tkinter import messagebox
+# import getpass
+# import pyfiglet
 from rich.live import Live
 from rich.table import Table
-from funciones import gradient_text
+from colorama import Fore, Style, init, Back
 
+from funciones import gradient_text
 # diccionario para guardar asuntos y cantidad de errores
 dic_errores = {}
+
+
+def leer_archivos(usuario, password, cadena_busqueda, segunda_condicion, archivo_csv="resultados.csv"):
+    resultados = []
+
+    contexto_ssl = ssl.create_default_context()
+    servidor = imaplib.IMAP4_SSL(
+        "imap.gmail.com", 993, ssl_context=contexto_ssl)
+    servidor.login(usuario, password)
+    servidor.select("inbox")
+
+    # Buscar solo emails no leídos
+    estado, mensajes = servidor.search(None, 'UNSEEN')
+    mensajes = mensajes[0].split()
+
+    for num in mensajes[::-1]:
+        estado, datos = servidor.fetch(num, "(RFC822)")
+        if estado != "OK":
+            continue
+
+        mensaje = email.message_from_bytes(datos[0][1])
+
+        fecha = mensaje["Date"]
+        sujeto = mensaje["Subject"]
+        if sujeto:
+            sujeto, encoding = decode_header(sujeto)[0]
+            if isinstance(sujeto, bytes):
+                sujeto = sujeto.decode(encoding if encoding else "utf-8")
+        else:
+            sujeto = "(Sin asunto)"
+
+        # Obtener el cuerpo del email
+        cuerpo = ""
+        if mensaje.is_multipart():
+            for parte in mensaje.walk():
+                if parte.get_content_type() == "text/plain" and not parte.get("Content-Disposition"):
+                    charset = parte.get_content_charset() or "utf-8"
+                    cuerpo = parte.get_payload(decode=True).decode(
+                        charset, errors="replace")
+                    break
+        else:
+            charset = mensaje.get_content_charset() or "utf-8"
+            cuerpo = mensaje.get_payload(decode=True).decode(
+                charset, errors="replace")
+
+        # Buscar la cadena principal y extraer 5 caracteres después
+        coincidencia = re.search(
+            re.escape(cadena_busqueda) + r"(.{0,5})", cuerpo)
+
+        if coincidencia:
+            errores = coincidencia.group(1).strip()
+            if segunda_condicion in cuerpo:
+                # Coinciden ambas condiciones → marcar como leído y guardar
+                resultados.append({
+                    "fecha": fecha,
+                    "sujeto": sujeto,
+                    "errores": errores
+                })
+                servidor.store(num, '+FLAGS', '\\Seen')
+            else:
+                # No cumple segunda condición → mantener como no leído
+                servidor.store(num, '-FLAGS', '\\Seen')
+        else:
+            # No se encuentra la primera cadena → mantener como no leído
+            servidor.store(num, '-FLAGS', '\\Seen')
+
+    servidor.logout()
+
+    # Guardar resultados en CSV
+    if resultados:
+        existe = os.path.exists(archivo_csv)
+        with open(archivo_csv, mode='a', newline='', encoding='utf-8') as archivo:
+            campos = ["fecha", "sujeto", "errores"]
+            escritor = csv.DictWriter(archivo, fieldnames=campos)
+            if not existe:
+                escritor.writeheader()
+            escritor.writerows(resultados)
+
+    return resultados
 
 
 def salir():
@@ -31,105 +115,12 @@ def guardar_datos():
     password = password_entry.get()
 
     try:
-        # Conectar a la cuenta de Gmail
-        mail = imaplib.IMAP4_SSL('imap.gmail.com')
-
-        mail.login(username, password)
-
-        # Seleccionar la bandeja de entrada
-        mail.select('inbox')
-
-        # Buscar correos no leídos
-        status, messages = mail.search(None, 'UNSEEN')
-# # Conectar a la cuenta de Gmail
-# mail = imaplib.IMAP4_SSL('imap.gmail.com')
-
-# # Pedir el usuario y la contraseña
-# USERNAME = input("Correo: ")
-# PASSWORD = getpass.getpass("Contraseña: ")
-# mail.login(USERNAME, PASSWORD)
-
-# # Seleccionar la bandeja de entrada
-# mail.select('inbox')
-
-# # Buscar correos no leídos
-# status, messages = mail.search(None, 'UNSEEN')
-
-# # Obtener la lista de IDs de correos no leídos
-# mail_ids = messages[0].split()
-# # print(mail_ids)
-# for i, mail_id in enumerate(mail_ids):
-#     status, msg_data = mail.fetch(mail_id, '(RFC822)')
-#     for response_part in msg_data:
-#         if isinstance(response_part, tuple):
-#             msg = email.message_from_bytes(response_part[1])
-#             subject = msg['subject']
-#             from_ = msg['from']
-#             # print(msg['from'])
-#             # ============print de control============
-#             # print(f'From: {from_}\nSubject: {subject}\n')
-#             # Obtener el cuerpo del mensaje
-#             if msg.is_multipart():
-#                 for part in msg.walk():
-#                     if part.get_content_type() == 'text/plain':
-#                         # he quitado el .decode()
-#                         body = part.get_payload(decode=True).decode('latin-1')
-#                         # ============print de control============
-#                         # print('\n=================\nMultipart\n=================\n')
-#                         # print(f'Body: {body}\n')
-#                         # print('\n=================\nMultipart\n=================\n')
-#                         # voy a intentar encontrar las palabras para podeer filtrar
-#                         if 'Número de errores:' in body:
-#                             indice = body.find("Número de errores:")
-#                             sub_body = body[indice+19:indice + 50]
-#                             errores = int(sub_body.split(".")[0])
-#                             # print(f"La cantidad de errores es: {errores}")
-#                             indice_2 = from_.find('<')
-#                             from_ = from_[:indice_2] + msg['Date']
-#                             dic_errores[from_] = errores
-#                         else:
-#                             mail.store(mail_id, '-FLAGS', '\\Seen')
-
-
-#             else:
-#                 body = msg.get_payload(decode=True).decode()
-#                 if 'Número de errores:' in body:
-#                     indice = body.find("Número de errores:")
-#                     sub_body = body[indice+19:indice + 50]
-#                     errores = int(sub_body.split(".")[0])
-#                     # print(f"La cantidad de errores es: {errores}")
-#                     # subject = subject[5:]
-#                     # dic_errores[subject] = errores
-#                     indice_2 = from_.find('<')
-#                     from_ = from_[:indice_2] + msg['Date']
-#                     dic_errores[from_] = errores
-#                     if 'Número de errores: 0' not in body:
-#                         mail.store(mail_id, '-FLAGS', '\\Seen')
-#                 elif 'Errores:' in body:
-#                     indice = body.find("Errores:")
-#                     sub_body = body[indice+9:indice + 50]
-#                     errores = int(sub_body.split(".")[0])
-#                     # print(f"La cantidad de errores es: {errores}")
-#                     # subject = subject[5:]
-#                     # dic_errores[subject] = errores
-#                     indice_2 = from_.find('<')
-#                     from_ = from_[:indice_2] + msg['Date']
-#                     dic_errores[from_] = errores
-#                     if 'Errores: 0' not in body:
-#                         mail.store(mail_id, '-FLAGS', '\\Seen')
-#                 else:
-#                     mail.store(mail_id, '-FLAGS', '\\Seen')
-#                 # ============print de control============
-#                 # print('\n=================\nnormal\n=================\n')
-#                 # print(f'Body: {body}\n')
-#                 # print('\n=================\nnormal\n=================\n')
+        leer_archivos(username, password, "Numero de errores:", "0")
 
     except Exception as e:
         messagebox.showerror("Error", str(e))
     # Aquí puedes usar las variables email y password como necesites
 
-    mail.close()
-    mail.logout()
     # hasta aca ---------------
     print(dic_errores)
 

@@ -1,4 +1,4 @@
-'''Leer correos no leidos y sacar su asunto, origen y cuerpo'''
+'''leer_correos_no_leidos_y_sacar_su_origen_y_cuerpo'''
 import imaplib
 import email
 # import time
@@ -40,7 +40,7 @@ with Progress(
     for mail_id in mail_ids:
         status, msg_data = mail.fetch(mail_id, '(RFC822)')
         for response_part in msg_data:
-            if isinstance(response_part, tuple):
+            if isinstance(response_part, tuple) and len(response_part) > 1:
                 msg = email.message_from_bytes(response_part[1])
                 subject = msg['subject']
                 from_ = msg['from']
@@ -128,6 +128,7 @@ if dic_errores:
         task = progress.add_task("Generando tabla...", total=len(dic_errores))
 
         for i, (clave, valor) in enumerate(dic_errores.items(), start=1):
+            # time.sleep(1)  # <-- Delay aquí
             if valor == 0:
                 ICONO = ":white_check_mark:"
                 table.add_row(
@@ -135,13 +136,13 @@ if dic_errores:
                     f"[bold green]{valor}[/bold green] {ICONO}"
                 )
             elif valor <= 3:
-                ICONO = ":warning:"
+                ICONO = ":pile_of_poo:"
                 table.add_row(
                     f"[bold yellow]{i}.- {clave}[/bold yellow]",
                     f"[bold yellow]{valor}[/bold yellow] {ICONO}"
                 )
             else:
-                ICONO = ":pile_of_poo:"
+                ICONO = ":x:"
                 table.add_row(
                     f"[bold red]{i}.- {clave}[/bold red]",
                     f"[bold red]{valor}[/bold red] {ICONO}"
@@ -156,13 +157,35 @@ if dic_errores:
             f"\n[bold red]🔴 Se detectaron un total de {total_errores} errores 🛠️[/bold red]")
     else:
         console.print(
-            f"\n[bold green]🟢 ¡Todo está bien! No se detectaron errores 😄[/bold green]")
+            "\n[bold green]🟢 ¡Todo está bien! No se detectaron errores 😄[/bold green]")
 
 else:
     table = Table()
     table.add_column("[bold green]MENSAJES[/bold green]", justify="center")
     table.add_row("[bold green]No hay MENSAJES[/bold green] :smiley:")
     console.print(table)
+
+
+# Contamos para gráfico #
+if dic_errores:
+    bien = sum(1 for v in dic_errores.values() if v == 0)
+    mal = sum(1 for v in dic_errores.values() if v != 0)
+    total = bien + mal
+    porc_bien = round((bien / total) * 100, 1)
+    porc_mal = round((mal / total) * 100, 1)
+
+    # Creamos consola
+    console = Console()
+
+    # Simulación de torta con barra coloreada
+    console.print("\n[bold]Grafico de errores:[/bold]")
+    console.print(
+        f"[green] {'█' * int(porc_bien // 2)}[/green][red]{'█' * int(porc_mal // 2)}[/red]")
+
+    # Texto extra
+    console.print(
+        f"[green]Bien: {porc_bien}%[/green]  [red]Mal: {porc_mal}%[/red]")
+
 
 # # ========== MOSTRAR TABLA FINAL otro metodo==========
 # init()

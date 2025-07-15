@@ -23,7 +23,9 @@ PASSWORD = getpass.getpass("Contraseña: ")
 mail.login(USERNAME, PASSWORD)
 mail.select('inbox')
 status, messages = mail.search(None, 'UNSEEN')
-mail_ids = messages[0].split()
+mail_ids = []
+if messages and len(messages) > 0:
+    mail_ids = messages[0].split()
 mail_num = len(mail_ids)
 
 # ========== PROCESAR CORREOS CON BARRA DE PROGRESO ==========

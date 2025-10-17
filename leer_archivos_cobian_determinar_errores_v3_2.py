@@ -7,6 +7,7 @@ from colorama import Fore, init
 import pyfiglet
 from rich.console import Console
 from rich.table import Table
+from rich import box
 from rich.progress import (
     Progress, SpinnerColumn, BarColumn, TextColumn, TimeRemainingColumn
 )
@@ -46,7 +47,6 @@ with Progress(
                 msg = email.message_from_bytes(response_part[1])
                 subject = msg['subject']
                 from_ = msg['from']
-
                 # Obtener el cuerpo del mensaje
                 if msg.is_multipart():
                     for part in msg.walk():
@@ -156,18 +156,21 @@ if dic_errores:
                     f"[bold green]{i}.- {clave}[/bold green]",
                     f"[bold green]{valor}[/bold green] {ICONO}"
                 )
+                table.add_row("[dim]" + "─" * 40 + "[/dim]", "")
             elif valor <= 3:
                 ICONO = ":pile_of_poo:"
                 table.add_row(
                     f"[bold yellow]{i}.- {clave}[/bold yellow]",
                     f"[bold yellow]{valor}[/bold yellow] {ICONO}"
                 )
+                table.add_row("[dim]" + "─" * 40 + "[/dim]", "")
             else:
                 ICONO = ":x:"
                 table.add_row(
                     f"[bold red]{i}.- {clave}[/bold red]",
                     f"[bold red]{valor}[/bold red] {ICONO}"
                 )
+                table.add_row("[dim]" + "─" * 40 + "[/dim]", "")
             progress.update(task, advance=1)
 
     console.print(table)

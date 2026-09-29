@@ -40,13 +40,24 @@ with Progress(
 ) as progress:
     task = progress.add_task("Leyendo correos...", total=len(mail_ids))
 
-    for mail_id in mail_ids:
-        status, msg_data = mail.fetch(mail_id, '(RFC822)')
+    for mail_id in mail_ids: # recorre todos los id de los email
+        status, msg_data = mail.fetch(mail_id, '(RFC822)') # '(RFC822)' le indica al servidor que devuelva el mensaje en su formato estándar completo (encabezados, cuerpo, adjuntos, en formato de bytes).
+        # msg_data contiene la respuesta del servidor organizada en una lista.
         for response_part in msg_data:
             if isinstance(response_part, tuple) and len(response_part) > 1:
+                # Estas dos líneas filtran la respuesta asegurándose de procesar únicamente los bloques que son tuplas con datos válidos, evitando errores al intentar leer las respuestas de control del servidor.
                 msg = email.message_from_bytes(response_part[1])
+                # permite acceder fácilmente a las distintas partes del correo como si fuera un diccionario.
                 subject = msg['subject']
                 from_ = msg['from']
+                subject_prefix = "Copia de seguridad completado satisfactoriamente - Notificación de Acronis True Image de"
+                # if subject and subject_prefix in subject:
+                texto_siguiente = subject_prefix # divide el sujeto separando lo que tiene sebjuect_prefix de lo demas y elimina los espacios en blanco con .strip()
+                clave = f"{texto_siguiente} {msg['Date']}"
+                dic_errores[clave] = 0
+                mail.store(mail_id, '+FLAGS', '\\Seen')
+                print(f"Subject: {subject} -> {clave}")
+                continue
                 # Obtener el cuerpo del mensaje
                 if msg.is_multipart():
                     for part in msg.walk():
@@ -80,6 +91,13 @@ with Progress(
                                 indice_2 = from_.find('<')
                                 from_ = from_[:indice_2] + msg['Date']
                                 dic_errores[from_] = errores
+                            # elif subject and subject_prefix in subject:
+                            #     texto_siguiente = subject.split(subject_prefix, 1)[1].strip() # divide el sujeto separando lo que tiene sebjuect_prefix de lo demas y elimina los espacios en blanco con .strip()
+                            #     clave = f"{texto_siguiente} {msg['Date']}" if texto_siguiente else f"{subject} {msg['Date']}"
+                            #     dic_errores[clave] = 0
+                            #     mail.store(mail_id, '+FLAGS', '\\Seen')
+                            #     print(f"Subject: {subject} -> {clave}")
+                            #     continue
                             else:
                                 marcar_no_leido(mail, mail_id)
                 else:
